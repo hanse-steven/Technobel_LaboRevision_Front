@@ -1,0 +1,58 @@
+<p-dataView #dv [value]="products">
+    <ng-template #list let-items>
+        <div class="grid grid-cols-12 gap-4 grid-nogutter">
+            <div class="col-span-12" *ngFor="let item of items; let i = index; let first = first">
+                <div
+                    class="flex flex-col sm:flex-row sm:items-center p-6 gap-4"
+                    [ngClass]="{ 'border-t border-surface-200 dark:border-surface-700': !first }"
+                >
+                    <div class="md:w-40 relative">
+                        <img
+                            class="block xl:block mx-auto rounded-border w-full"
+                            src="https://placehold.co/300x200"
+                            [alt]="item.name"
+                        />
+                        <p-tag
+                            [value]="(item.quantity === 0 ? 'Rupture de stock' : 'En stock')"
+                            [severity]="item.quantity === 0 ? 'danger' : 'success'"
+                            class="absolute"
+                            styleClass="dark:!bg-surface-900"
+                            [style.left.px]="4"
+                            [style.top.px]="4"
+                        />
+                    </div>
+                    <div class="flex flex-col md:flex-row justify-between md:items-center flex-1 gap-6">
+                        <div class="flex flex-row md:flex-col justify-between items-start gap-2">
+                            <div>
+                                <div class="text-lg font-medium text-surface-900 dark:text-surface-0 mt-2">{{ item.name }}</div>
+                            </div>
+                        </div>
+                        <div class="flex flex-col md:items-end gap-8">
+                            <span class="text-xl font-semibold text-surface-900 dark:text-surface-0">
+                                {{ item.price | currency: 'EUR' }}
+                            </span>
+                            <form
+                                [formGroup]="productForms[i]"
+                                (ngSubmit)="submit(i)"
+                                class="flex flex-row gap-2 justify-between"
+                            >
+                                <input type="hidden" formControlName="id">
+                                <p-select
+                                    [options]="getQuantityOptions(item.quantity)"
+                                    formControlName="quantity"
+                                    class="flex-grow"
+                                />
+                                <p-button
+                                    icon="pi pi-shopping-cart"
+                                    label="Ajouter au panier"
+                                    [disabled]="item.quantity === 0"
+                                    type="submit"
+                                />
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </ng-template>
+</p-dataView>

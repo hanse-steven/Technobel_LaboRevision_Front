@@ -1,0 +1,4 @@
+<p-toast />
+<app-show-products [products]="products" (addToCart)="addToCart($event)"/>
+
+<app-show-cart [items]="this._c.cartItems$.value" />
