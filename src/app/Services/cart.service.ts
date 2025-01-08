@@ -1,50 +1,48 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from '@angular/common/http'
-import {BehaviorSubject, Observable} from 'rxjs'
+import {BehaviorSubject} from 'rxjs'
 import {environment} from '../../environments/environment'
 import {CartItem} from '../Models/CartItem.model'
+import {SignalRBase} from '../Utils/SignalRBase'
 import {AddItemCart} from '../Models/AddCart.model'
-import {HubConnection, HubConnectionBuilder} from '@microsoft/signalr'
 
 @Injectable({
   providedIn: 'root'
 })
-export class CartService {
-    private _hubConnection!: HubConnection
+export class CartService extends SignalRBase {
     cartItems$: BehaviorSubject<CartItem[]>
 
-    constructor(
-        private readonly _http: HttpClient,
-
-    ) {
+    constructor() {
+        super(environment.cart)
         this.cartItems$ = new BehaviorSubject<CartItem[]>([])
-        this.GetFromAPI().subscribe(
-            value => this.cartItems$.next(value)
-        )
 
-        const hubBuilder: HubConnectionBuilder = new HubConnectionBuilder()
-        this._hubConnection = hubBuilder
-            .withUrl(environment.cart_websocket)
-            .withAutomaticReconnect()
-            .build()
-
-        this._hubConnection.start().then(r => console.log("Connexion SignalR établie"))
-
-        this._hubConnection.on('CartUpdated', (data: CartItem[]) => {
-            console.log("Actualisation des données")
+        this._hubConnection.on("GetCart", (data: CartItem[]) => {
+            data.sort((a, b) => a.name.localeCompare(b.name))
             this.cartItems$.next(data)
         })
     }
 
-    Get(): CartItem[] {
-        return this.cartItems$.value
+    refresh(): void {
+        this._hubConnection.invoke("GetCart").catch(err => console.error(err))
     }
 
-    private GetFromAPI(): Observable<CartItem[]> {
-        return this._http.get<CartItem[]>(environment.cart)
+    async addToCart(item: AddItemCart): Promise<boolean> {
+        return this._hubConnection.invoke("AddToCart", item.id, item.quantity)
+            .then(() => {
+                return true;
+            })
+            .catch(() => {
+                return false;
+            });
+
     }
 
-    AddToCart(item: AddItemCart): Observable<string> {
-        return this._http.post<string>(environment.cart,item)
+    async ModifyQuantityOfProduct(item: AddItemCart): Promise<boolean> {
+        return this._hubConnection.invoke("ModifyQuantityOfProduct", item.id, item.quantity)
+            .then(() => {
+                return true;
+            })
+            .catch(() => {
+                return false;
+            });
     }
 }

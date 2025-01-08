@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {Button} from "primeng/button"
 import {CurrencyPipe, NgClass, NgForOf} from "@angular/common"
 import {DataView} from "primeng/dataview"
@@ -23,7 +23,7 @@ import {AddItemCart} from '../../Models/AddCart.model'
     templateUrl: './show-products.component.html',
     styleUrl: './show-products.component.scss'
 })
-export class ShowProductsComponent implements OnInit{
+export class ShowProductsComponent implements OnInit, OnChanges{
     @Input() products: Product[] = []
     @Output() addToCart = new EventEmitter<AddItemCart>
 
@@ -34,6 +34,16 @@ export class ShowProductsComponent implements OnInit{
     ) {}
 
     ngOnInit(): void {
+        this.ForceRender()
+    }
+
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes) {
+            this.ForceRender()
+        }
+    }
+
+    private ForceRender(): void {
         this.products.forEach(p => {
             const form = this._fb.group({
                 id: [p.id, Validators.required],

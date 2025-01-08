@@ -1,6 +1,3 @@
 import {Product} from './Product.model'
 
-export interface CartItem {
-    product: Product
-    quantity: number
-}
+export interface CartItem extends Product {}

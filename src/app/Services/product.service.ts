@@ -1,20 +1,25 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http'
-import {Observable} from 'rxjs'
+import {BehaviorSubject} from 'rxjs'
 import {Product} from '../Models/Product.model'
 import {environment} from '../../environments/environment'
+import {SignalRBase} from '../Utils/SignalRBase'
 
 @Injectable({
     providedIn: 'root'
 })
-export class ProductService {
+export class ProductService extends SignalRBase{
+    products$: BehaviorSubject<Product[]>
 
-    constructor(
-        private readonly _http: HttpClient
-    ) {
+    constructor() {
+        super(environment.product)
+        this.products$ = new BehaviorSubject<Product[]>([])
+
+        this._hubConnection.on("GetProducts", (data: Product[]) => {
+            this.products$.next(data)
+        })
     }
 
-    findAll(): Observable<Product[]> {
-        return this._http.get<Product[]>(environment.product)
+    refresh(): void {
+        this._hubConnection.invoke("GetProducts").catch(err => console.error(err))
     }
 }
