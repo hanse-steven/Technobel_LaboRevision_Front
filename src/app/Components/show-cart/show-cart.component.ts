@@ -9,6 +9,10 @@ import {Drawer} from 'primeng/drawer'
 import {Router} from '@angular/router'
 import {CartService} from '../../Services/cart.service'
 import {MessageService} from 'primeng/api'
+import {Card} from 'primeng/card';
+import {FloatLabel} from 'primeng/floatlabel';
+import {InputText} from 'primeng/inputtext';
+import {FormsModule} from '@angular/forms';
 
 @Component({
     selector: 'app-show-cart',
@@ -16,24 +20,34 @@ import {MessageService} from 'primeng/api'
         Button,
         TableModule,
         CurrencyPipe,
-        Drawer
+        Drawer,
+        FloatLabel,
+        InputText,
+        FormsModule,
     ],
     templateUrl: './show-cart.component.html',
     styleUrl: './show-cart.component.scss'
 })
 export class ShowCartComponent {
-    @Input() items: CartItem[] = []
-    @Input() isVisible!: boolean
-
+    items: CartItem[] = []
+    isVisible!: boolean
 
     constructor(
-        private readonly router: Router,
         private readonly _c: CartService,
         private readonly _m: MessageService,
-    ) {}
+    ) {
+        this._c.cartItems$.subscribe({
+            next: data => this.items = Array.isArray(data) ? data : []
+        })
 
-    RedirectToHome() {
-        this.router.navigate(["home"])
+        this._c.showCart$.subscribe({
+            next: data => this.isVisible = data
+        })
+
+    }
+
+    HideCart() {
+        this._c.showCart$.next(false)
     }
 
     DeleteItem(item: CartItem) {
@@ -91,5 +105,9 @@ export class ShowCartComponent {
                     detail: `Echec de la suppression d\'un objet: ${err.message}`
                 })
             })
+    }
+
+    TotalPrice(): number {
+        return this.items.reduce((acc, item) => acc + item.price * item.quantity, 0)
     }
 }

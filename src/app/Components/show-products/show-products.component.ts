@@ -7,6 +7,7 @@ import {Select} from "primeng/select"
 import {Tag} from "primeng/tag"
 import {Product} from '../../Models/Product.model'
 import {AddItemCart} from '../../Models/AddCart.model'
+import {ScrollTop} from 'primeng/scrolltop';
 
 @Component({
     selector: 'app-show-products',

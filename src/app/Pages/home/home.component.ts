@@ -26,27 +26,16 @@ import {ActivatedRoute} from '@angular/router'
 })
 export class HomeComponent implements OnInit{
     products: Product[] = []
-    cartItems: CartItem[] = []
-    protected cartVisible = false
 
     constructor(
         private readonly _p: ProductService,
         protected readonly _c: CartService,
         private readonly _m: MessageService,
-        private readonly _ar: ActivatedRoute
     ) {}
 
     ngOnInit(): void {
-        this._ar.data.subscribe(data => {
-            this.cartVisible = data['cart'];
-        });
-
         this._p.products$.subscribe({
             next: data => this.products = Array.isArray(data) ? data : []
-        })
-
-        this._c.cartItems$.subscribe({
-            next: data => this.cartItems = Array.isArray(data) ? data : []
         })
     }
 

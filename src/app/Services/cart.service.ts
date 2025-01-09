@@ -10,10 +10,12 @@ import {AddItemCart} from '../Models/AddCart.model'
 })
 export class CartService extends SignalRBase {
     cartItems$: BehaviorSubject<CartItem[]>
+    showCart$: BehaviorSubject<boolean>
 
     constructor() {
         super(environment.cart)
         this.cartItems$ = new BehaviorSubject<CartItem[]>([])
+        this.showCart$ = new BehaviorSubject<boolean>(false)
 
         this._hubConnection.on("GetCart", (data: CartItem[]) => {
             data.sort((a, b) => a.name.localeCompare(b.name))
@@ -38,6 +40,16 @@ export class CartService extends SignalRBase {
 
     async ModifyQuantityOfProduct(item: AddItemCart): Promise<boolean> {
         return this._hubConnection.invoke("ModifyQuantityOfProduct", item.id, item.quantity)
+            .then(() => {
+                return true;
+            })
+            .catch(() => {
+                return false;
+            });
+    }
+
+    async ValidateCart(email: string): Promise<boolean> {
+        return this._hubConnection.invoke("ValidateCart", email)
             .then(() => {
                 return true;
             })

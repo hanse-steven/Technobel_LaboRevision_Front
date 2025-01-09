@@ -1,6 +1,6 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
 import {Menubar} from 'primeng/menubar'
-import {MenuItem} from 'primeng/api'
+import {MenuItem, MenuItemCommandEvent} from 'primeng/api'
 import {CartService} from '../../Services/cart.service'
 import {CartItem} from '../../Models/CartItem.model'
 
@@ -14,23 +14,28 @@ import {CartItem} from '../../Models/CartItem.model'
 })
 
 export class HeaderComponent implements OnInit{
-    items: MenuItem[] = [
-        {
-            label: 'Accueil',
-            icon: 'pi pi-home',
-            routerLink: 'home'
-        },
-        {
-            label: 'Panier',
-            icon: 'pi pi-shopping-cart',
-            routerLink: 'cart',
-            badge: '0'
-        }
-    ]
+    items: MenuItem[]
 
     constructor(
         private readonly _cart: CartService,
-        private readonly _cdr: ChangeDetectorRef) {}
+    ) {
+        this.items = [
+            {
+                label: 'Accueil',
+                icon: 'pi pi-home',
+                routerLink: 'home'
+            },
+            {
+                label: 'Panier',
+                icon: 'pi pi-shopping-cart',
+                badge: '0',
+
+                command(_) {
+                    _cart.showCart$.next(!_cart.showCart$.value)
+                }
+            }
+        ]
+    }
 
     ngOnInit(): void {
         this._cart.cartItems$.subscribe({
