@@ -1,24 +1,36 @@
 import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {Menubar} from 'primeng/menubar'
+import {Menubar, MenubarSub} from 'primeng/menubar'
 import {MenuItem, MenuItemCommandEvent} from 'primeng/api'
 import {CartService} from '../../Services/cart.service'
 import {CartItem} from '../../Models/CartItem.model'
+import {User} from '../../Models/User.model';
+import {AuthService} from '../../Services/auth.service';
+import {Button, ButtonDirective} from 'primeng/button';
 
 @Component({
     selector: 'app-header',
     imports: [
-        Menubar
+        Menubar,
+        ButtonDirective,
+        Button,
+        MenubarSub
     ],
     templateUrl: './header.component.html',
     styleUrl: './header.component.scss'
 })
 
 export class HeaderComponent implements OnInit{
-    items: MenuItem[]
+    currentUser: User | undefined
+    items: MenuItem[] = []
 
     constructor(
         private readonly _cart: CartService,
+        private readonly _auth: AuthService,
     ) {
+        this._auth.currentUser$.subscribe({
+            next: (user) => { this.currentUser = user }
+        })
+
         this.items = [
             {
                 label: 'Accueil',
@@ -29,7 +41,7 @@ export class HeaderComponent implements OnInit{
                 label: 'Panier',
                 icon: 'pi pi-shopping-cart',
                 badge: '0',
-
+                routerLink: 'home',
                 command(_) {
                     _cart.showCart$.next(!_cart.showCart$.value)
                 }

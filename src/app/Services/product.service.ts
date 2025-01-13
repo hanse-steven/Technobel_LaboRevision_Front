@@ -22,4 +22,8 @@ export class ProductService extends SignalRBase{
     refresh(): void {
         this._hubConnection.invoke("GetProducts").catch(err => console.error(err))
     }
+
+    RefreshCartFromAll(): void {
+        this._hubConnection.invoke("RefreshCartFromAll").catch(err => console.error(err))
+    }
 }

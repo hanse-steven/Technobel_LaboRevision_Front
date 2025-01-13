@@ -45,6 +45,7 @@ export class ShowProductsComponent implements OnInit, OnChanges{
     }
 
     private ForceRender(): void {
+        this.productForms = []
         this.products.forEach(p => {
             const form = this._fb.group({
                 id: [p.id, Validators.required],

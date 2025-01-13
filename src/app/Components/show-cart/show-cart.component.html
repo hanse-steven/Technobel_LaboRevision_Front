@@ -21,7 +21,7 @@
                             class="w-24 rounded"
                         />
                     </td>
-                    <td>
+                    <td [ngStyle]="{color: CheckAvailableStock(item) ? 'inherit' : 'red'}">
                         <p-button icon="pi pi-angle-down" size="small" severity="secondary" rounded outlined text (onClick)="DecreaseQuantity(item)" />
                         {{ item.quantity }}
                         <p-button icon="pi pi-angle-up" size="small" severity="secondary" rounded outlined text (onClick)="IncreaseQuantity(item)" />
@@ -40,13 +40,14 @@
             </ng-template>
         </p-table>
 
-        <form class="flex flex-col gap-2 mt-5" for>
+        <form [formGroup]="cartForm" class="flex flex-col gap-2 mt-5" (ngSubmit)="ValidateCart()">
             <p-floatlabel variant="on" class="field">
                 <input
                     id="email"
                     name="email"
                     class="w-full"
                     type="email"
+                    formControlName="email"
                     pInputText
                     required
                 />
@@ -61,7 +62,10 @@
                 </div>
             }
             @else {
-                <p-button label="Valider le panier" icon="pi pi-check" styleClass="w-full" />
+                <button pButton class="w-full" [disabled]="!CheckStockForItems()">
+                    <i class="pi pi-check"></i>
+                    <span pButtonLabel>Valider le panier</span>
+                </button>
             }
         </form>
     }

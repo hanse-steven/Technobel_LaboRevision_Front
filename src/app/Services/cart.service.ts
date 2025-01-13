@@ -4,6 +4,7 @@ import {environment} from '../../environments/environment'
 import {CartItem} from '../Models/CartItem.model'
 import {SignalRBase} from '../Utils/SignalRBase'
 import {AddItemCart} from '../Models/AddCart.model'
+import {ProductService} from './product.service';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +13,9 @@ export class CartService extends SignalRBase {
     cartItems$: BehaviorSubject<CartItem[]>
     showCart$: BehaviorSubject<boolean>
 
-    constructor() {
+    constructor(
+        private readonly _p: ProductService
+    ) {
         super(environment.cart)
         this.cartItems$ = new BehaviorSubject<CartItem[]>([])
         this.showCart$ = new BehaviorSubject<boolean>(false)
@@ -51,6 +54,8 @@ export class CartService extends SignalRBase {
     async ValidateCart(email: string): Promise<boolean> {
         return this._hubConnection.invoke("ValidateCart", email)
             .then(() => {
+                this.reset_session_id()
+                this._p.RefreshCartFromAll()
                 return true;
             })
             .catch(() => {

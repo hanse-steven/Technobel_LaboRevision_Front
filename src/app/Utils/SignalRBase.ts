@@ -27,4 +27,9 @@ export abstract class SignalRBase {
         }
         return id
     }
+
+    protected reset_session_id(): void {
+        let id = uuidv4()
+        localStorage.setItem("laborevision_session", id)
+    }
 }
