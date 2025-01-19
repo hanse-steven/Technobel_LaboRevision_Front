@@ -1,21 +1,20 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component} from '@angular/core'
 import {Button, ButtonDirective, ButtonLabel} from 'primeng/button'
 import {TableModule} from 'primeng/table'
-import {CurrencyPipe, NgClass, NgStyle} from '@angular/common'
-import {Rating} from 'primeng/rating'
-import {Tag} from 'primeng/tag'
+import {CurrencyPipe, NgStyle} from '@angular/common'
 import {CartItem} from '../../Models/CartItem.model'
 import {Drawer} from 'primeng/drawer'
-import {Router} from '@angular/router'
 import {CartService} from '../../Services/cart.service'
 import {MessageService} from 'primeng/api'
-import {Card} from 'primeng/card';
-import {FloatLabel} from 'primeng/floatlabel';
-import {InputText} from 'primeng/inputtext';
-import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {ValidateCartForm} from '../../Forms/ValidateCart.form';
-import {ProductService} from '../../Services/product.service';
-import {Product} from '../../Models/Product.model';
+import {FloatLabel} from 'primeng/floatlabel'
+import {InputText} from 'primeng/inputtext'
+import {FormBuilder, FormGroup, FormsModule, ReactiveFormsModule} from '@angular/forms'
+import {ValidateCartForm} from '../../Forms/ValidateCart.form'
+import {ProductService} from '../../Services/product.service'
+import {Product} from '../../Models/Product.model'
+import {Divider} from 'primeng/divider'
+import {RouterLink} from '@angular/router'
+import {AuthService} from '../../Services/auth.service'
 
 @Component({
     selector: 'app-show-cart',
@@ -30,8 +29,9 @@ import {Product} from '../../Models/Product.model';
         ReactiveFormsModule,
         ButtonDirective,
         ButtonLabel,
-        NgClass,
         NgStyle,
+        Divider,
+        RouterLink,
     ],
     templateUrl: './show-cart.component.html',
     styleUrl: './show-cart.component.scss'
@@ -39,6 +39,7 @@ import {Product} from '../../Models/Product.model';
 export class ShowCartComponent {
     items: CartItem[] = []
     isVisible!: boolean
+    isConnected: boolean = false
 
     cartForm: FormGroup
 
@@ -46,10 +47,14 @@ export class ShowCartComponent {
         private readonly _c: CartService,
         private readonly _p: ProductService,
         private readonly _m: MessageService,
-        private readonly _fb: FormBuilder
+        private readonly _fb: FormBuilder,
+        private readonly _auth: AuthService,
     ) {
         this.cartForm = this._fb.group({
             ...ValidateCartForm
+        })
+        this.cartForm.setValue({
+            email: this._auth.getTokenData()?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || null
         })
 
         this._c.cartItems$.subscribe({
@@ -60,6 +65,16 @@ export class ShowCartComponent {
             next: data => this.isVisible = data
         })
 
+        this._auth.currentUser$.subscribe({
+            next: data => {
+                this.isConnected = data !== undefined
+                if (this.isConnected) {
+                    this.cartForm.setValue({
+                        email: this._auth.getTokenData()?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || null
+                    })
+                }
+            }
+        })
     }
 
     HideCart() {

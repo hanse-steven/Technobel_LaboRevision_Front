@@ -46,26 +46,28 @@
                     id="email"
                     name="email"
                     class="w-full"
-                    type="email"
+                    [type]="isConnected ? 'hidden' : 'email'"
                     formControlName="email"
                     pInputText
                     required
                 />
-                <label for="email">Email</label>
+                <label for="email" [hidden]="isConnected">Email</label>
             </p-floatlabel>
 
-            <!-- TODO mettre en place la validation si connecté -->
-            @if (false) {
-                <div class="flex flex-row justify-between">
-                    <p-button label="Valider sans se connecter" icon="pi pi-check" fluid />
-                    <p-button label="Se connecter et valider" icon="pi pi-check" fluid />
-                </div>
-            }
-            @else {
-                <button pButton class="w-full" [disabled]="!CheckStockForItems()">
+            <button pButton class="w-full" [disabled]="!CheckStockForItems()">
+                <i class="pi pi-check"></i>
+                <span pButtonLabel>Valider le panier</span>
+            </button>
+
+            @if (!isConnected) {
+                <p-divider align="center">
+                    <b>ou</b>
+                </p-divider>
+
+                <a pButton class="w-full" routerLink="/login">
                     <i class="pi pi-check"></i>
-                    <span pButtonLabel>Valider le panier</span>
-                </button>
+                    <span pButtonLabel>Connexion</span>
+                </a>
             }
         </form>
     }

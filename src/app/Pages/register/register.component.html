@@ -1,1 +1,68 @@
-<p>register works!</p>
+<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+    <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+        <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight">Inscription</h2>
+    </div>
+
+    <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <form class="space-y-6" [formGroup]="registerForm" (ngSubmit)="submit()">
+            <div class="mt-2">
+                <p-floatlabel variant="on" class="field">
+                    <input
+                        id="email"
+                        name="email"
+                        class="w-full"
+                        type="email"
+                        formControlName="email"
+                        pInputText
+                        required
+                    />
+                    <label for="email">Email</label>
+                </p-floatlabel>
+            </div>
+
+            <div class="mt-2">
+                <p-floatlabel variant="on" class="field">
+                    <input
+                        id="password"
+                        name="password"
+                        class="w-full"
+                        type="password"
+                        formControlName="password"
+                        pInputText
+                        required
+                    />
+                    <label for="email">Mot de passe</label>
+                </p-floatlabel>
+            </div>
+
+            <div class="mt-2">
+                <p-floatlabel variant="on" class="field">
+                    <input
+                        id="confirmPassword"
+                        name="confirmPassword"
+                        class="w-full"
+                        type="password"
+                        formControlName="confirmPassword"
+                        pInputText
+                        required
+                    />
+                    <label for="confirmPassword">Répéter Mot de passe</label>
+                </p-floatlabel>
+            </div>
+
+            <button pButton class="w-full">
+                <i class="pi pi-user-plus"></i>
+                <span pButtonLabel>Inscription</span>
+            </button>
+
+            <p-divider align="center">
+                <b>ou</b>
+            </p-divider>
+
+            <a pButton class="w-full" routerLink="/login">
+                <i class="pi pi-check"></i>
+                <span pButtonLabel>Connexion</span>
+            </a>
+        </form>
+    </div>
+</div>

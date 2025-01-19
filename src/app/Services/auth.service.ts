@@ -5,6 +5,9 @@ import {HttpClient} from '@angular/common/http';
 import {Router} from '@angular/router';
 import {MessageService} from 'primeng/api';
 import {UserAuthFormModel} from '../Models/UserAuthFormModel';
+import {environment} from '../../environments/environment';
+import {jwtDecode} from 'jwt-decode';
+import {JwtPayload} from '../Models/JwtPayload.model';
 
 @Injectable({
     providedIn: 'root'
@@ -15,7 +18,6 @@ export class AuthService {
     constructor(
         private readonly _http: HttpClient,
         private readonly _router: Router,
-        //private readonly _m: MessageService
     ) {
         let jsonUser = localStorage.getItem('currentUser')
         this.currentUser$ = new BehaviorSubject<User | undefined>(
@@ -23,28 +25,19 @@ export class AuthService {
         )
     }
 
-    register(form: UserAuthFormModel): Observable<User> {
-        return this._http.post<User>('/api/auth/register', form).pipe(
-            tap(_ => {
-                // this._m.add({
-                //     severity: 'success',
-                //     summary: 'Authentification',
-                //     detail: 'Création du compte réussie'
-                // })
+    login(form: UserAuthFormModel): Observable<User> {
+        return this._http.post<User>(environment.auth + 'login', form).pipe(
+            tap(u => {
+                this.currentUser$.next(u)
+                localStorage.setItem('currentUser', JSON.stringify(u))
             })
         )
     }
 
-    login(form: UserAuthFormModel): Observable<User> {
-        return this._http.post<User>('/api/auth/login', form).pipe(
-            tap(u => {
-                this.currentUser$.next(u)
-                localStorage.setItem('currentUser', JSON.stringify(u))
-                // this._m.add({
-                //     severity: 'success',
-                //     summary: 'Authentification',
-                //     detail: 'Connexion réussie'
-                // })
+    register(form: UserAuthFormModel): Observable<any> {
+        return this._http.post(environment.auth + 'register', form).pipe(
+            tap(_ => {
+                this._router.navigate(['/login'])
             })
         )
     }
@@ -52,11 +45,13 @@ export class AuthService {
     logout(): void {
         localStorage.removeItem('currentUser')
         this.currentUser$.next(undefined)
-        // this._m.add({
-        //     severity: 'success',
-        //     summary: 'Authentification',
-        //     detail: 'Déconnexion réussie'
-        // })
-        this._router.navigate(["/auth/login"])
+        this._router.navigate(["/"])
+    }
+
+    getTokenData(): JwtPayload | undefined {
+        if (this.currentUser$.value?.token) {
+            return jwtDecode<JwtPayload>(this.currentUser$.value.token)
+        }
+        return undefined
     }
 }

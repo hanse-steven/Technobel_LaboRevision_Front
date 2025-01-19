@@ -5,11 +5,8 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms'
 import {ShowProductsComponent} from '../../Components/show-products/show-products.component'
 import {AddItemCart} from '../../Models/AddCart.model'
 import {CartService} from '../../Services/cart.service'
-import {Toast} from 'primeng/toast'
 import {MessageService} from 'primeng/api'
 import {ShowCartComponent} from '../../Components/show-cart/show-cart.component'
-import {CartItem} from '../../Models/CartItem.model'
-import {ActivatedRoute} from '@angular/router'
 
 @Component({
     selector: 'app-home',
@@ -17,7 +14,6 @@ import {ActivatedRoute} from '@angular/router'
         FormsModule,
         ReactiveFormsModule,
         ShowProductsComponent,
-        Toast,
         ShowCartComponent
     ],
     templateUrl: './home.component.html',
